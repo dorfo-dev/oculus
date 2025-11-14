@@ -56,7 +56,7 @@
   "author": "Rodolfo <rodolfo@email.com>",
   "license": "MIT",
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.0",
+    "@vitejs/plugin-vue": "^6.0.1",
     "concurrently": "^8.2.2",
     "electron": "^39.2.0",
     "electron-builder": "^24.9.1",
