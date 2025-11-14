@@ -23,11 +23,18 @@
       "electron/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "electron/preload.js",
+        "to": "preload.js"
+      }
+    ],
+    "asar": true,
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "build/icon.ico"
+      "icon": "icons/icon.ico"
     },
     "linux": {
       "target": [
@@ -35,9 +42,15 @@
         "deb"
       ],
       "category": "Office",
-      "icon": "build/icon.png",
+      "icon": "icons/icon.png",
       "maintainer": "Rodolfo <rodolfo@email.com>"
-    }
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://seuservidor.com/releases/"
+      }
+    ]
   },
   "keywords": [
     "electron",
