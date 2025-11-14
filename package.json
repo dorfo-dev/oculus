@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron . --no-sandbox\"",
     "electron:build": "vite build && electron-builder",
     "electron:build:win": "vite build && electron-builder --win",
     "electron:build:linux": "vite build && electron-builder --linux"
@@ -24,13 +24,19 @@
       "package.json"
     ],
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "build/icon.ico"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Office",
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "maintainer": "Rodolfo <rodolfo@email.com>"
     }
   },
   "keywords": [
@@ -39,7 +45,7 @@
     "pdf",
     "viewer"
   ],
-  "author": "",
+  "author": "Rodolfo <rodolfo@email.com>",
   "license": "MIT",
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
@@ -50,7 +56,6 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
-    "pdfjs-dist": "^4.2.67",
     "vue": "^3.4.0"
   }
 }

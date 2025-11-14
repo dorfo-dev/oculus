@@ -7,26 +7,26 @@
           📁 Selecionar Diretório
         </button>
       </div>
-      
+
       <div class="directory-info" v-if="currentDirectory">
         <div class="directory-path">
           <strong>Diretório:</strong>
           <span class="path-text">{{ currentDirectory }}</span>
         </div>
       </div>
-      
+
       <div class="pdf-list-container">
         <div v-if="!currentDirectory" class="empty-state">
           <p>Selecione um diretório para começar</p>
         </div>
-        
+
         <div v-else-if="pdfFiles.length === 0" class="empty-state">
           <p>Nenhum arquivo PDF encontrado</p>
         </div>
-        
+
         <div v-else class="pdf-list">
-          <div 
-            v-for="pdf in pdfFiles" 
+          <div
+            v-for="pdf in pdfFiles"
             :key="pdf.path"
             @click="selectPdf(pdf)"
             :class="['pdf-item', { active: selectedPdfPath === pdf.path }]"
@@ -40,8 +40,8 @@
         </div>
       </div>
     </div>
-    
-    <div 
+
+    <div
       class="resizer"
       @mousedown="startResize"
     ></div>
@@ -64,9 +64,10 @@ const startWidth = ref(0)
 const selectDirectory = async () => {
   try {
     const dirPath = await window.electronAPI.openDirectory()
-    
+
     if (dirPath) {
       currentDirectory.value = dirPath
+      console.debug('Selected directory:', dirPath)
       await loadPdfFiles(dirPath)
     }
   } catch (error) {
@@ -79,7 +80,8 @@ const loadPdfFiles = async (dirPath) => {
     const files = await window.electronAPI.readDirectory(dirPath)
     pdfFiles.value = files
     selectedPdfPath.value = null
-    
+    console.debug('PDF files found:', files.length, files)
+
     // Auto-select first PDF if available
     if (files.length > 0) {
       selectPdf(files[0])
@@ -91,6 +93,7 @@ const loadPdfFiles = async (dirPath) => {
 
 const selectPdf = (pdf) => {
   selectedPdfPath.value = pdf.path
+  console.debug('PDF selected:', pdf)
   emit('pdf-selected', pdf)
 }
 
@@ -99,19 +102,19 @@ const startResize = (e) => {
   isResizing.value = true
   startX.value = e.clientX
   startWidth.value = sidebarWidth.value
-  
+
   document.addEventListener('mousemove', handleResize)
   document.addEventListener('mouseup', stopResize)
-  
+
   e.preventDefault()
 }
 
 const handleResize = (e) => {
   if (!isResizing.value) return
-  
+
   const delta = e.clientX - startX.value
   const newWidth = startWidth.value + delta
-  
+
   // Constrain width between 200px and 600px
   if (newWidth >= 200 && newWidth <= 600) {
     sidebarWidth.value = newWidth
