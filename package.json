@@ -20,14 +20,9 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*",
+      "electron/main.js",
+      "electron/preload.js",
       "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "electron/preload.js",
-        "to": "preload.js"
-      }
     ],
     "asar": true,
     "win": {
