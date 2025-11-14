@@ -10,7 +10,7 @@
 
       <div class="directory-info" v-if="currentDirectory">
         <div class="directory-path">
-          <strong>Diretório:</strong>
+          <strong>Diretório atual:</strong>
           <span class="path-text">{{ currentDirectory }}</span>
         </div>
       </div>
@@ -56,7 +56,7 @@ const emit = defineEmits(['pdf-selected'])
 const currentDirectory = ref(null)
 const pdfFiles = ref([])
 const selectedPdfPath = ref(null)
-const sidebarWidth = ref(300)
+const sidebarWidth = ref(parseInt(localStorage.getItem('sidebarWidth')) || 300)
 const isResizing = ref(false)
 const startX = ref(0)
 const startWidth = ref(0)
@@ -68,10 +68,22 @@ const selectDirectory = async () => {
     if (dirPath) {
       currentDirectory.value = dirPath
       console.debug('Selected directory:', dirPath)
+      // Save to localStorage
+      localStorage.setItem('lastOpenedDirectory', dirPath)
       await loadPdfFiles(dirPath)
     }
   } catch (error) {
     console.error('Error selecting directory:', error)
+  }
+}
+
+// Load last opened directory on mount
+const loadLastDirectory = async () => {
+  const lastDir = localStorage.getItem('lastOpenedDirectory')
+  if (lastDir) {
+    console.debug('Restoring last directory:', lastDir)
+    currentDirectory.value = lastDir
+    await loadPdfFiles(lastDir)
   }
 }
 
@@ -82,8 +94,15 @@ const loadPdfFiles = async (dirPath) => {
     selectedPdfPath.value = null
     console.debug('PDF files found:', files.length, files)
 
-    // Auto-select first PDF if available
-    if (files.length > 0) {
+    // Try to restore last selected PDF in this directory
+    const lastPdfPath = localStorage.getItem('lastSelectedPdf')
+    const lastPdf = files.find(f => f.path === lastPdfPath)
+
+    if (lastPdf) {
+      // Restore last selected PDF
+      selectPdf(lastPdf)
+    } else if (files.length > 0) {
+      // Auto-select first PDF if no last selection or file not found
       selectPdf(files[0])
     }
   } catch (error) {
@@ -94,6 +113,8 @@ const loadPdfFiles = async (dirPath) => {
 const selectPdf = (pdf) => {
   selectedPdfPath.value = pdf.path
   console.debug('PDF selected:', pdf)
+  // Save last selected PDF
+  localStorage.setItem('lastSelectedPdf', pdf.path)
   emit('pdf-selected', pdf)
 }
 
@@ -123,9 +144,16 @@ const handleResize = (e) => {
 
 const stopResize = () => {
   isResizing.value = false
+  // Save sidebar width to localStorage
+  localStorage.setItem('sidebarWidth', sidebarWidth.value.toString())
   document.removeEventListener('mousemove', handleResize)
   document.removeEventListener('mouseup', stopResize)
 }
+
+onMounted(() => {
+  // Load last directory on app start
+  loadLastDirectory()
+})
 
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleResize)
