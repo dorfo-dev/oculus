@@ -14,14 +14,14 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.resolve(__dirname, 'preload.js')
     }
   })
 
   // In development, load from Vite dev server
   // In production, load from built files
   const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
-  
+
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173')
     mainWindow.webContents.openDevTools()
@@ -35,11 +35,11 @@ ipcMain.handle('dialog:openDirectory', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory']
   })
-  
+
   if (!result.canceled && result.filePaths.length > 0) {
     return result.filePaths[0]
   }
-  
+
   return null
 })
 
@@ -48,11 +48,11 @@ ipcMain.handle('fs:readDirectory', async (event, dirPath) => {
   try {
     const files = await fs.readdir(dirPath)
     const pdfFiles = []
-    
+
     for (const file of files) {
       const fullPath = path.join(dirPath, file)
       const stat = await fs.stat(fullPath)
-      
+
       if (stat.isFile() && path.extname(file).toLowerCase() === '.pdf') {
         pdfFiles.push({
           name: file,
@@ -61,7 +61,7 @@ ipcMain.handle('fs:readDirectory', async (event, dirPath) => {
         })
       }
     }
-    
+
     return pdfFiles
   } catch (error) {
     console.error('Error reading directory:', error)
